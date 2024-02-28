@@ -1,0 +1,4 @@
+gcp_project      = ""
+gcp_region       = ""
+eth_private_key  = ""
+near_private_key = ""

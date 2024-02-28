@@ -1,0 +1,19 @@
+{
+  "name": "controller-cloud-functions",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "functions-framework",
+    "start:pause": "functions-framework --target=pause",
+    "start:unpause": "functions-framework --target=unpause"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@google-cloud/functions-framework": "^3.3.0",
+    "ethers": "^6.11.1",
+    "near-api-js": "^3.0.3"
+  }
+}
