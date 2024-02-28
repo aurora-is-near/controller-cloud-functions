@@ -3,6 +3,8 @@ import { ethers } from "ethers";
 import {
   RPC_URL_BY_CHAIN_ID,
   keyStore,
+  MAINNET,
+  NEAR_CHAINS,
   NEAR_KEYPAIR,
   NEAR_NETWORK,
   NEAR_MAINNET_CONFIG,
@@ -26,7 +28,10 @@ export default async function pause(req, res) {
   }
 
   const { networkId, chainId, accountId } = req.body;
-  if (!networkId || !chainId || !accountId) {
+  const network = parseInt(chainId);
+  const isNearChain = NEAR_CHAINS.includes(chainId);
+  const isEvmChain = network > 0;
+  if (!networkId || !chainId || !accountId || !(isNearChain || isEvmChain)) {
     res.sendStatus(400);
     return;
   }
@@ -35,7 +40,7 @@ export default async function pause(req, res) {
     await keyStore.setKey(chainId, NEAR_SIGNER_ACCOUNT, NEAR_KEYPAIR);
 
     const nearConnection = await nearAPI.connect(
-      chainId === "mainnet" ? NEAR_MAINNET_CONFIG : NEAR_TESTNET_CONFIG,
+      chainId === MAINNET ? NEAR_MAINNET_CONFIG : NEAR_TESTNET_CONFIG,
     );
 
     const account = await nearConnection.account(NEAR_SIGNER_ACCOUNT);
@@ -57,8 +62,7 @@ export default async function pause(req, res) {
     }
   }
 
-  const network = Number(chainId);
-  if (networkId === ETHEREUM_NETWORK && network > 0) {
+  if (networkId === ETHEREUM_NETWORK) {
     const rpcUrl = RPC_URL_BY_CHAIN_ID[chainId];
 
     const provider = new ethers.JsonRpcProvider(rpcUrl, network);

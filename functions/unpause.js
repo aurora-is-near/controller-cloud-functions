@@ -17,13 +17,14 @@ export default async function unpause(req, res) {
   }
 
   const { networkId, chainId, accountId } = req.body;
-  if (!networkId || !chainId || !accountId) {
+  const network = Number(chainId);
+  const isEvmChain = network > 0;
+  if (!networkId || !chainId || !accountId || !isEvmChain) {
     res.sendStatus(400);
     return;
   }
 
-  const network = Number(chainId);
-  if (networkId === ETHEREUM_NETWORK && network > 0) {
+  if (networkId === ETHEREUM_NETWORK) {
     const rpcUrl = RPC_URL_BY_CHAIN_ID[chainId];
 
     const provider = new ethers.JsonRpcProvider(rpcUrl, network);

@@ -27,6 +27,10 @@ export const NEAR_TESTNET_CONFIG = {
   helperUrl: "https://helper.testnet.near.org",
   explorerUrl: "https://testnet.nearblocks.io",
 };
+
+export const MAINNET = "mainnet";
+export const TESTNET = "testnet";
+export const NEAR_CHAINS = [MAINNET, TESTNET];
 export const NEAR_NETWORK = "near";
 // todo: replace with real controller address
 export const NEAR_SIGNER_ACCOUNT = "controller-account.near";

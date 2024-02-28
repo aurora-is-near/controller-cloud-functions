@@ -5,6 +5,10 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "lint": "eslint . && npm run format:check",
+    "lint:fix": "eslint . --fix && npm run format",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check",
     "start": "functions-framework",
     "start:pause": "functions-framework --target=pause",
     "start:unpause": "functions-framework --target=unpause"
@@ -15,5 +19,10 @@
     "@google-cloud/functions-framework": "^3.3.0",
     "ethers": "^6.11.1",
     "near-api-js": "^3.0.3"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "3.2.5"
   }
 }
