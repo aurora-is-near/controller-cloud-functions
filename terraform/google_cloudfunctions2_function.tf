@@ -1,10 +1,10 @@
 resource "google_cloudfunctions2_function" "pause_function" {
   name        = "pause"
-  location    = "us-central1"
+  location    = var.gcp_region
   description = ""
 
   build_config {
-    runtime     = "nodejs16"
+    runtime     = "nodejs18"
     entry_point = "pause" # Set the entry point 
     source {
       storage_source {
@@ -18,6 +18,7 @@ resource "google_cloudfunctions2_function" "pause_function" {
     max_instance_count = 1
     available_memory   = "256M"
     timeout_seconds    = 60
+    service_account_email = google_service_account.runner_sa.email
 
     secret_environment_variables {
       key        = "NEAR_PRIVATE_KEY"

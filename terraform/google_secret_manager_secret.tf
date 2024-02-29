@@ -4,7 +4,7 @@ resource "google_secret_manager_secret" "near_private_key" {
   replication {
     user_managed {
       replicas {
-        location = "us-central1"
+        location = var.gcp_region
       }
     }
   }
@@ -16,7 +16,7 @@ resource "google_secret_manager_secret" "eth_private_key" {
   replication {
     user_managed {
       replicas {
-        location = "us-central1"
+        location = var.gcp_region
       }
     }
   }
