@@ -15,9 +15,9 @@ resource "google_cloudfunctions2_function" "pause_function" {
   }
 
   service_config {
-    max_instance_count = 1
-    available_memory   = "256M"
-    timeout_seconds    = 60
+    max_instance_count    = 1
+    available_memory      = "256M"
+    timeout_seconds       = 60
     service_account_email = google_service_account.runner_sa.email
 
     secret_environment_variables {
@@ -35,6 +35,14 @@ resource "google_cloudfunctions2_function" "pause_function" {
     }
   }
 
-  depends_on = [google_secret_manager_secret.near_private_key, google_secret_manager_secret.eth_private_key]
+  depends_on = [
+    google_project_service.cloudfunctions,
+    google_project_service.cloudbuild,
+    google_project_service.secretmanager,
+    google_storage_bucket.controller_functions_bucket,
+    google_storage_bucket_object.controller_functions_bucket_object,
+    google_secret_manager_secret.near_private_key,
+    google_secret_manager_secret.eth_private_key
+  ]
 }
 

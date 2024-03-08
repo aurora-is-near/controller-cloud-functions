@@ -35,3 +35,5 @@ terraform.rc
 
 .env
 terraform-output.json
+
+controller-functions-source.zip

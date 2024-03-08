@@ -8,6 +8,9 @@ resource "google_secret_manager_secret" "near_private_key" {
       }
     }
   }
+  depends_on = [
+    google_project_service.secretmanager
+  ]
 }
 
 resource "google_secret_manager_secret" "eth_private_key" {
@@ -20,4 +23,7 @@ resource "google_secret_manager_secret" "eth_private_key" {
       }
     }
   }
+  depends_on = [
+    google_project_service.secretmanager
+  ]
 }

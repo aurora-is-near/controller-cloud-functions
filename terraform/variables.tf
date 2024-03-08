@@ -8,9 +8,9 @@ variable "gcp_region" {
   default     = "us-central1"
 }
 
-variable "functions_zip_path" {
-  description = "Zip of functions source code"
-  default     = "../functions.zip"
+variable "functions_source_path" {
+  description = "Path of functions source code"
+  default     = "../functions"
 }
 
 variable "near_private_key" {
