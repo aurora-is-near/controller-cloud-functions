@@ -1,18 +1,23 @@
-import nearAPI from "near-api-js";
+import nearAPI, { KeyPair } from "near-api-js";
+import { parseSeedPhrase } from "near-seed-phrase";
 import { ethers } from "ethers";
+import base58 from "bs58";
 import {
   RPC_URL_BY_CHAIN_ID,
   keyStore,
   MAINNET,
   NEAR_CHAINS,
-  NEAR_KEYPAIR,
   NEAR_NETWORK,
   NEAR_MAINNET_CONFIG,
   NEAR_TESTNET_CONFIG,
-  NEAR_SIGNER_ACCOUNT,
+  NEAR_INDEX_BY_CHAIN_ID,
+  NEAR_DERIVATION_PATH,
+  NEAR_MNEMONIC,
   NEAR_CONTROLLER_CONTRACT,
   NEAR_DEFAULT_PAUSE_METHOD,
-  ETHEREUM_PK,
+  ETH_INDEX_BY_CHAIN_ID,
+  ETHEREUM_DERIVATION_PATH,
+  ETHEREUM_MNEMONIC,
   ETHEREUM_NETWORK,
 } from "./config.js";
 import pausableAbi from "./Pausable.abi.js";
@@ -29,21 +34,38 @@ export default async function pause(req, res) {
 
   const { networkId, chainId, accountId } = req.body;
   const network = parseInt(chainId);
-  const isNearChain = NEAR_CHAINS.includes(chainId);
-  const isEvmChain = network > 0;
+  const isNearChain = networkId === NEAR_NETWORK && NEAR_CHAINS.includes(chainId);
+  const isEvmChain = networkId === ETHEREUM_NETWORK && network > 0;
   if (!networkId || !chainId || !accountId || !(isNearChain || isEvmChain)) {
     res.sendStatus(400);
     return;
   }
 
-  if (networkId === NEAR_NETWORK) {
-    await keyStore.setKey(chainId, NEAR_SIGNER_ACCOUNT, NEAR_KEYPAIR);
+  if (isNearChain) {
+    // `'` character at the end is required
+    const derivationPath = `${NEAR_DERIVATION_PATH}/${NEAR_INDEX_BY_CHAIN_ID[chainId]}'`;
+    console.log(`Deriving public key from ${derivationPath}`);
+
+    const { publicKey, secretKey } = parseSeedPhrase(
+      NEAR_MNEMONIC,
+      derivationPath,
+    );
+    const keypair = KeyPair.fromString(secretKey);
+    console.log(`Public Key: ${publicKey}`);
+
+    const [, pk] = publicKey.split(":");
+    const implicitAccountId = Buffer.from(
+      base58.decode(pk),
+    ).toString("hex");
+    console.info(`Signer: ${implicitAccountId}`);
+
+    await keyStore.setKey(chainId, implicitAccountId, keypair);
 
     const nearConnection = await nearAPI.connect(
       chainId === MAINNET ? NEAR_MAINNET_CONFIG : NEAR_TESTNET_CONFIG,
     );
 
-    const account = await nearConnection.account(NEAR_SIGNER_ACCOUNT);
+    const account = await nearConnection.account(implicitAccountId);
     const contract = new nearAPI.Contract(account, NEAR_CONTROLLER_CONTRACT, {
       changeMethods: ["delegate_pause"],
     });
@@ -62,11 +84,18 @@ export default async function pause(req, res) {
     }
   }
 
-  if (networkId === ETHEREUM_NETWORK) {
+  if (isEvmChain) {
     const rpcUrl = RPC_URL_BY_CHAIN_ID[chainId];
-
     const provider = new ethers.JsonRpcProvider(rpcUrl, network);
-    const wallet = new ethers.Wallet(ETHEREUM_PK, provider);
+
+    const derivationPath = `${ETHEREUM_DERIVATION_PATH}/${ETH_INDEX_BY_CHAIN_ID[chainId]}`;
+    console.log(`Deriving public key from ${derivationPath}`);
+
+    const wallet = ethers.HDNodeWallet.fromMnemonic(
+      ethers.Mnemonic.fromPhrase(ETHEREUM_MNEMONIC),
+      derivationPath,
+    ).connect(provider);
+    console.info(`Signer: ${wallet.publicKey}`);
 
     const contract = new ethers.Contract(accountId, pausableAbi, wallet);
     try {
