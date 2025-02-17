@@ -26,6 +26,16 @@ import pausableAbi from "./Pausable.abi.js";
  * @param {{ body: { networkId: string; chainId: string | number; accountId: string } }} req
  */
 export default async function pause(req, res) {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type");
+
+  if (req.method === "OPTIONS") {
+    // Send response to OPTIONS requests
+    res.status(204).send("");
+    return;
+  }
+
   if (req.method !== "POST") {
     res.set("Allow", "POST");
     res.sendStatus(405);
@@ -34,7 +44,8 @@ export default async function pause(req, res) {
 
   const { networkId, chainId, accountId } = req.body;
   const network = parseInt(chainId);
-  const isNearChain = networkId === NEAR_NETWORK && NEAR_CHAINS.includes(chainId);
+  const isNearChain =
+    networkId === NEAR_NETWORK && NEAR_CHAINS.includes(chainId);
   const isEvmChain = networkId === ETHEREUM_NETWORK && network > 0;
   if (!networkId || !chainId || !accountId || !(isNearChain || isEvmChain)) {
     res.sendStatus(400);
@@ -54,9 +65,7 @@ export default async function pause(req, res) {
     console.log(`Public Key: ${publicKey}`);
 
     const [, pk] = publicKey.split(":");
-    const implicitAccountId = Buffer.from(
-      base58.decode(pk),
-    ).toString("hex");
+    const implicitAccountId = Buffer.from(base58.decode(pk)).toString("hex");
     console.info(`Signer: ${implicitAccountId}`);
 
     await keyStore.setKey(chainId, implicitAccountId, keypair);
