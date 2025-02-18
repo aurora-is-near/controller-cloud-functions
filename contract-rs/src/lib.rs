@@ -1,5 +1,5 @@
 use near_plugins::{access_control, pause, AccessControlRole, AccessControllable, Pausable};
-use near_sdk::borsh::BorshDeserialize;
+use near_sdk::borsh::{BorshDeserialize, BorshSerialize};
 use near_sdk::serde::{Deserialize, Serialize};
 use near_sdk::{env, log, near, AccountId, PanicOnDefault};
 
