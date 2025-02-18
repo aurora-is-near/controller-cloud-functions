@@ -7,6 +7,7 @@ function App() {
   const [networkId, setNetworkId] = useState("ethereum");
   const [chainId, setChainId] = useState("");
   const [accountId, setAccountId] = useState("");
+  const [sender, setSender] = useState("");
   const [errors, setErrors] = useState<{
     chainId?: string;
     accountId?: string;
@@ -54,7 +55,7 @@ function App() {
 
     if (!validateInputs()) return;
 
-    const payload = { networkId, chainId, accountId };
+    const payload = { networkId, chainId, accountId, sender };
     try {
       const response = await fetch(PAUSE_FUNCTION, {
         method: "POST",
@@ -118,6 +119,18 @@ function App() {
             <span className="error">{errors.accountId}</span>
           )}
         </div>
+        {networkId === "near" && (
+          <div className="form-group">
+            <label htmlFor="sender">Sender</label>
+            <input
+              id="sender"
+              type="text"
+              value={sender}
+              onChange={(e) => setSender(e.target.value)}
+              placeholder="e.g., alice.near"
+            />
+          </div>
+        )}
         <button type="submit">Pause Contract</button>
       </form>
       {message && <p className="message">{message}</p>}
