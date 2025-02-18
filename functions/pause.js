@@ -23,7 +23,7 @@ import {
 import pausableAbi from "./Pausable.abi.js";
 
 /**
- * @param {{ body: { networkId: string; chainId: string | number; accountId: string } }} req
+ * @param {{ body: { networkId: string; chainId: string | number; accountId: string; sender: string | undefined } }} req
  */
 export default async function pause(req, res) {
   res.set("Access-Control-Allow-Origin", "*");
@@ -42,7 +42,7 @@ export default async function pause(req, res) {
     return;
   }
 
-  const { networkId, chainId, accountId } = req.body;
+  const { networkId, chainId, accountId, sender } = req.body;
   const network = parseInt(chainId);
   const isNearChain =
     networkId === NEAR_NETWORK && NEAR_CHAINS.includes(chainId);
@@ -66,15 +66,16 @@ export default async function pause(req, res) {
 
     const [, pk] = publicKey.split(":");
     const implicitAccountId = Buffer.from(base58.decode(pk)).toString("hex");
-    console.info(`Signer: ${implicitAccountId}`);
+    const signer = sender || implicitAccountId;
+    console.info(`Signer: ${signer}`);
 
-    await keyStore.setKey(chainId, implicitAccountId, keypair);
+    await keyStore.setKey(chainId, signer, keypair);
 
     const nearConnection = await nearAPI.connect(
       chainId === MAINNET ? NEAR_MAINNET_CONFIG : NEAR_TESTNET_CONFIG,
     );
 
-    const account = await nearConnection.account(implicitAccountId);
+    const account = await nearConnection.account(signer);
     const contract = new nearAPI.Contract(account, NEAR_CONTROLLER_CONTRACT, {
       changeMethods: ["delegate_pause"],
     });
