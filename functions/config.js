@@ -48,7 +48,7 @@ export const NEAR_TESTNET_CONFIG = {
 };
 
 // TODO: should this be user defined too or will this be a singleton?
-export const NEAR_CONTROLLER_CONTRACT = "controller-demo.testnet";
+export const NEAR_CONTROLLER_CONTRACT = "controller-ctl.testnet";
 
 // TODO: confirm this is the correct default, e.g. engine uses "pause_contract"
 export const NEAR_DEFAULT_PAUSE_METHOD = "pa_pause_feature";
