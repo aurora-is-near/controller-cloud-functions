@@ -10,5 +10,4 @@ near account delete-account $contract beneficiary $signer network-config testnet
 near account create-account sponsor-by-faucet-service $contract autogenerate-new-keypair save-to-keychain network-config testnet create
 
 # 3. Deploy contract
-cargo near deploy $contract with-init-call new json-args '{"pause_manager": "'$signer'"}' prepaid-gas '100.0 Tgas' attached-dep
-osit '0 NEAR' network-config testnet sign-with-keychain send
+cargo near deploy $contract with-init-call new json-args '{"pause_manager": "'$signer'"}' prepaid-gas '100.0 Tgas' attached-deposit '0 NEAR' network-config testnet sign-with-keychain send
