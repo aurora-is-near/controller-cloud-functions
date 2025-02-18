@@ -71,21 +71,27 @@ export default async function pause(req, res) {
 
     await keyStore.setKey(chainId, signer, keypair);
 
-    const nearConnection = await nearAPI.connect(
+    const near = await nearAPI.connect(
       chainId === MAINNET ? NEAR_MAINNET_CONFIG : NEAR_TESTNET_CONFIG,
     );
 
-    const account = await nearConnection.account(signer);
-    const contract = new nearAPI.Contract(account, NEAR_CONTROLLER_CONTRACT, {
-      changeMethods: ["delegate_pause"],
-    });
+    const contract = new nearAPI.Contract(
+      near.connection,
+      NEAR_CONTROLLER_CONTRACT,
+      {
+        changeMethods: ["delegate_pause"],
+      },
+    );
 
     try {
+      const account = await near.account(signer);
       await contract.delegate_pause({
+        signerAccount: account,
         args: {
           receiver_id: accountId,
           pause_method_name: req.body.methodName || NEAR_DEFAULT_PAUSE_METHOD,
         },
+        amount: 1, // NOTE: 1 yoctoNEAR required
       });
     } catch (e) {
       console.error(e);
