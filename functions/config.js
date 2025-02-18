@@ -47,7 +47,8 @@ export const NEAR_TESTNET_CONFIG = {
   explorerUrl: "https://testnet.nearblocks.io",
 };
 
-// todo: should this be user defined too or will this be a singleton?
-export const NEAR_CONTROLLER_CONTRACT = "controller-contract.near";
-// todo: confirm this is the correct default, e.g. engine uses "pause_contract"
+// TODO: should this be user defined too or will this be a singleton?
+export const NEAR_CONTROLLER_CONTRACT = "controller-demo.testnet";
+
+// TODO: confirm this is the correct default, e.g. engine uses "pause_contract"
 export const NEAR_DEFAULT_PAUSE_METHOD = "pa_pause_feature";
